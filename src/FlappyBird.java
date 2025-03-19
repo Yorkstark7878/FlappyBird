@@ -70,6 +70,8 @@ public class FlappyBird extends JPanel implements ActionListener, KeyListener {
     boolean gameOver = false;
     double score = 0;
 
+    boolean gameStarted = false;
+
     // Constructeur de la classe FlappyBird
     FlappyBird() {
         setPreferredSize(new Dimension(boardWidth, boardHeight));
@@ -120,7 +122,15 @@ public class FlappyBird extends JPanel implements ActionListener, KeyListener {
     // Eléments du jeu
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        draw(g);
+        
+        if (!gameStarted){
+            // Affiche un écran de démarrage
+            g.setColor(Color.BLACK);
+            g.setFont(new Font("Arial", Font.PLAIN, 15));
+            g.drawString("Appuyez sur une touche pour jouer", 60, boardHeight / 2);
+        } else{
+            draw(g);
+        }
     }
 
     public void draw(Graphics g) {
@@ -186,20 +196,15 @@ public class FlappyBird extends JPanel implements ActionListener, KeyListener {
                a.y + a.height > b.y; // Le coin inférieur gauche de a dépasse le coin supérieur gauche de b
     }
 
-    // Gestion de la boucle de jeu
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        move();
-        repaint();
-        if (gameOver) {
-            placePipesTimer.stop();
-            gameLoop.stop();
-        }
-    }
+    
 
     // Gestion des entrées clavier (barre ESPACE pour sauter)
     @Override
     public void keyPressed(KeyEvent e) {
+        if (!gameStarted){
+            gameStarted = true;
+            return;
+        }
         if (e.getKeyCode() == KeyEvent.VK_SPACE) {
             velocityY = -9; // Fait sauter l'oiseau
             if (gameOver) {
@@ -220,4 +225,16 @@ public class FlappyBird extends JPanel implements ActionListener, KeyListener {
 
     @Override
     public void keyReleased(KeyEvent e) {}
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (gameStarted) {
+            move();
+        }
+        repaint();
+        if (gameOver) {
+            placePipesTimer.stop();
+            gameLoop.stop();
+        }
+    }
 }
